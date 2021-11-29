@@ -1,5 +1,8 @@
 package SudukoPack;
 
+/**
+Interface försedd av Maj
+*/
 public interface SudokuSolver{   
     /**
      * Check if it is legal to place value at row, col.
