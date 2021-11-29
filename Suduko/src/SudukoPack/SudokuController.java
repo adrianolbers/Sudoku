@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -15,9 +14,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-
 import org.w3c.dom.Text;
 
+
+/**
+"Main" för att skapa panelen rita och lösa sudokut med interfacet SukokuSolver
+*/
 public class SudokuController implements SudokuSolver {
 	int[][] board = new int[9][9];
 	int[][] savedBoard = new int[9][9];
