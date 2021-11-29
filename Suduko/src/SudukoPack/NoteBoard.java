@@ -3,6 +3,9 @@ package SudukoPack;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+Temporärt sudoku för att beräkna alla möjligheter på respektive plats
+*/
 public class NoteBoard {
 	ArrayList<ArrayList<Integer>> possibleNbrs;
 	
