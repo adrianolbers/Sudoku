@@ -3,18 +3,17 @@ package SudukoPack;
 import java.util.ArrayList;
 import java.util.Random;
 
-/**
-Temporärt sudoku för att beräkna alla möjligheter på respektive plats
-*/
+import javax.swing.JOptionPane;
+
 public class NoteBoard {
 	ArrayList<ArrayList<Integer>> possibleNbrs;
 	
-	public NoteBoard(int[][] board, SudokuSolver solver) {
+	public NoteBoard(int[][] board, SudokuController solver) {
 		this.addPossibleNbrs(board, solver);
 	}
 	
 	
-	private void addPossibleNbrs(int[][] board, SudokuSolver solver) {
+	private void addPossibleNbrs(int[][] board, SudokuController solver) {
 		possibleNbrs = new ArrayList<ArrayList<Integer>>();
 		
 		for(int k=0;k<9*9;k++){
@@ -32,6 +31,7 @@ public class NoteBoard {
 				}
 			}
 		}
+		
 		
 	}
 	
@@ -56,42 +56,84 @@ public class NoteBoard {
 		return value;
 	}
 	
-	public boolean checkNoteIfLeagal(int row, int col, int value) {
-		ArrayList<ArrayList<Integer>> tempBoard = possibleNbrs;
-		int rowStart = (row/3)*3;
-		int colStart = (col/3)*3;
+	public boolean solvedNbrExist(){
+		return possibleNbrs.get(this.getMostPossiblePlace()).size()==1;
 		
-		int countNbrOfValues = 0;
-		int countAtSameRow = 0;
-		int countAtSameCol = 0;
-		for(int rowInc=0; rowInc<9;rowInc=rowInc+3){
-			for(int colInc=0; colInc<9;colInc=colInc+3){
-				if(rowStart!=rowInc || colStart!=colInc){
-				countNbrOfValues = 0;
-				countAtSameRow = 0;
-				countAtSameCol = 0;
-				for(int k=rowInc;k<rowInc+3;k++) {
-					for(int i=colInc;i<colInc+3;i++){
-						if(tempBoard.get(k*9+i).contains(value)) {
-							countNbrOfValues++;
-						}if(tempBoard.get(k*9+i).contains(value) && k==row){
-							countAtSameRow++;
-						}if(tempBoard.get(k*9+i).contains(value) && i==col){
-							countAtSameCol++;
+	}
+	
+	public boolean checkIfBoadIsSolvable(int [][] board, SudokuController solver) {
+		for(int row=0;row<9;row=row+3) {
+			for(int col=0;col<9;col=col+3) {
+				
+				for(int value=1;value<10;value++) {
+					boolean notFound = true;
+					for(int k=(row/3)*3;k<(row/3)*3+3;k++) {
+						for(int i=(col/3)*3;i<(col/3)*3+3;i++) {
+							if(value==board[k][i]) {
+								if(notFound==false) {
+									return false;
+								}
+								notFound = false;
+							}else if(possibleNbrs.get(k*9+i).contains(value)) {
+								notFound = false;
+							}
 						}
-						if(countNbrOfValues>3 || (countNbrOfValues==countAtSameRow||countNbrOfValues==countAtSameCol)) {
-							return true;
-						}
-						
 					}
-				}
-				if(countAtSameRow>1 || countAtSameCol>1) {
-					return false;
-				}
-				}
-			}	
+					if(notFound) {
+						return false;
+					}
+				}	
+						
+			}
 		}
 		
+		for(int k=0;k<9;k++) {
+			for(int i=0;i<9;i++){
+				if(!(board[k][i]==0)) {
+					if(!solver.checkIfLegal(k, i, board[k][i])) {
+						return false;
+					}
+					
+				}
+			}
+		}
+			
+				
+		return true;
+	}
+	
+	public boolean checkNoteIfLeagal(int row, int col, int value) {
+		for(int indexSqr=0; indexSqr<9; indexSqr=indexSqr+3){
+			if((row/3)*3!=indexSqr && (col/3)*3!=indexSqr) {
+				int totalSameNbrs = 0;
+				int[] indexCol = new int[3];		
+				for(int k=indexSqr;k<indexSqr+3;k++) {
+					for(int i=(col/3)*3;i<((col/3)*3)+3;i++) {
+						if(possibleNbrs.get(k*9+i).contains(value)){
+							indexCol[i%3]++;
+							totalSameNbrs++;
+						}
+					}		
+				}
+				if(indexCol[col%3] == totalSameNbrs && totalSameNbrs>1 && totalSameNbrs<=3) {
+					return false;
+				}
+				
+				totalSameNbrs = 0;
+				int[] indexRow = new int[3];	
+				for(int k=(row/3)*3;k<((row/3)*3)+3;k++) {
+					for(int i=indexSqr;i<indexSqr+3;i++) {
+						if(possibleNbrs.get(k*9+i).contains(value)){
+							indexRow[k%3]++;
+							totalSameNbrs++;
+						}
+					}
+				}
+				if(indexRow[row%3] == totalSameNbrs && totalSameNbrs>1 && totalSameNbrs<=3) {
+					return false;
+				}
+			}
+		}
 		
 		return true;
 	}

@@ -1,11 +1,9 @@
 package SudukoPack;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -14,15 +12,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+
 import org.w3c.dom.Text;
 
-
-/**
-"Main" för att skapa panelen rita och lösa sudokut med interfacet SukokuSolver
-*/
 public class SudokuController implements SudokuSolver {
 	int[][] board = new int[9][9];
 	int[][] savedBoard = new int[9][9];
+	NoteBoard noteBoard;
 	
 	JPanel panelSudoku;
 	int[][] myNumbersMed= { {4, 0, 9, 1, 8, 3, 0, 0, 0}, 
@@ -61,6 +57,15 @@ public class SudokuController implements SudokuSolver {
 								{6, 0, 5, 0, 2, 0, 0, 4, 0},
 								{7, 0, 0, 0, 0, 0, 0, 0, 0},
 								{0, 0, 0, 0, 0, 9, 2, 0, 0}};
+	int[][] myNumbersWorldsHardest= { {8, 0, 0, 0, 0, 0, 0, 0, 0}, 
+							{0, 0, 3, 6, 0, 0, 0, 0, 0},
+							{0, 7, 0, 0, 9, 0, 2, 0, 0},
+							{0, 5, 0, 0, 0, 7, 0, 0, 0},
+							{0, 0, 0, 0, 4, 5, 7, 0, 0},
+							{0, 0, 0, 1, 0, 0, 0, 3, 0},
+							{0, 0, 1, 0, 0, 0, 0, 6, 8},
+							{0, 0, 8, 5, 0, 0, 0, 1, 0},
+							{0, 9, 0, 0, 0, 0, 4, 0, 0}};
 	
 	public SudokuController() {
 		SwingUtilities.invokeLater(() -> createWindow("Sudoku", 300, 400));
@@ -99,16 +104,23 @@ public class SudokuController implements SudokuSolver {
 			}
 		}
 		
-		this.init(myNumbersMed);
+		this.init(myNumbersWorldsHardest);
 		JPanel panelFunction = new JPanel();
 		JButton solveBtn = new JButton("Solve");
 		ActionListener action = event -> {
 			this.init(this.getBoard());
 			int iterations = 0;
 			int restarts = 0;
-			while(this.isNotSolved()){
+			boolean dontStart = false;
+			noteBoard = new NoteBoard(board, this);
+			if(!noteBoard.checkIfBoadIsSolvable(board, this)) {
+				JOptionPane messageText = new JOptionPane();
+				messageText.showMessageDialog(frame ,"Can't solve Sudoku!");
+				dontStart = true;
+			}
+			long timeStart = System. currentTimeMillis();
+			while(!this.isFull() && !dontStart){
 				boolean bruteForce = true;
-				board = this.getBoard();
 				for(int k=0;k<9;k++){
 					for(int i=0;i<9;i++) {
 						if(this.checkIfEmpty(k, i)){
@@ -118,23 +130,30 @@ public class SudokuController implements SudokuSolver {
 						}
 					}
 				}
-				if(this.isFull() && this.isNotSolved()) {
+				if(bruteForce && !noteBoard.checkIfBoadIsSolvable(board, this)) {
 					this.clear();
 					this.init(savedBoard);
 					restarts++;
 				}else if(bruteForce){
-					NoteBoard noteBoard = new NoteBoard(board, this);
 					if(noteBoard.getMostPossiblePlace()>-1){
-						int newRow = noteBoard.getMostPossiblePlace()/9;
-						int newCol = noteBoard.getMostPossiblePlace()%9;
-						int newValue = noteBoard.getRandomNbrFromIndex(newRow, newCol);
-						this.add(newRow, newCol, newValue);
+						do{
+							int newRow = noteBoard.getMostPossiblePlace()/9;
+							int newCol = noteBoard.getMostPossiblePlace()%9;
+							int newValue = noteBoard.getRandomNbrFromIndex(newRow, newCol);
+							this.add(newRow, newCol, newValue);
+						}while(noteBoard.solvedNbrExist()); 
 					}
 				}
 				iterations++;
 			}
+			long timeEnd = System. currentTimeMillis();
+			System.out.println("Time it took: "+ (timeEnd-timeStart)/1000 + "s");
 			System.out.println("Iterations: "+iterations);
 			System.out.println("Restarts: "+restarts);
+			JOptionPane messageText = new JOptionPane();
+			messageText.showMessageDialog(frame ,"It took " + (timeEnd-timeStart)/1000 + "s and "+(timeEnd-timeStart)%1000+"ms\n"+
+			"Iterations: "+iterations+"\n"+
+			"Restarts: "+restarts+"\n");
         };
 		solveBtn.addActionListener(action);
 		
@@ -164,26 +183,22 @@ public class SudokuController implements SudokuSolver {
 	
 	@Override
 	public boolean checkIfLegal(int row, int col, int value) {
-		
-		int options = 9;
+		if(!checkRowNCol(row,col,value) || !checkSquare(row,col,value)){
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean checkSquare(int row, int col, int value) {
 		for(int k=(row/3)*3;k<(row/3)*3+3;k++) {
 			for(int i=(col/3)*3;i<(col/3)*3+3;i++) {
 				if((k==row && i==col));
 				else if(board[k][i]==value) {
 					return false;
-				}else if(board[k][i]>0 || !this.checkRowNCol(k, i, value) ) {
-					options--;
 				}
 			}
 		}
-
-		if(options==1) {
-			this.add(row, col, value);
-			return true;
-		}else if(checkRowNCol(row,col,value)){
-			return true;
-		}
-		return false;
+		return true;
 	}
 	
 	private boolean checkRowNCol(int row, int col, int value){
@@ -239,18 +254,43 @@ public class SudokuController implements SudokuSolver {
 
 	@Override
 	public boolean solve(int row, int col) {
-		NoteBoard noteBoard = new NoteBoard(board, this);
-		int temp = 0;
-		int value = 0;
-		for(int k=1;k<10;k++) {
-			if(this.checkIfLegal(row, col, k) && noteBoard.checkNoteIfLeagal(row,col,value)) {
-				temp++;
-				value = k;
+		for(int v=1;v<10;v++){
+			if(this.checkIfLegal(row, col, v) && noteBoard.checkNoteIfLeagal(row, col, v)) {	
+				int options = 9;
+				for(int k=0;k<9;k++) {
+					if((board[k][col]>0 || !this.checkIfLegal(k, col, v)) || !noteBoard.checkNoteIfLeagal(k, col, v)) {
+						options--;
+					}
+				}
+				if(options==1) {
+					this.add(row, col, v);
+					return true; 
+				}
+				
+				options = 9;
+				for(int k=0;k<9;k++) {
+					if((board[row][k]>0 || !this.checkIfLegal(row, k, v)) || !noteBoard.checkNoteIfLeagal(row, k, v)) {
+						options--;
+					}
+				}
+				if(options==1) {
+					this.add(row, col, v);
+					return true; 
+				}
+				
+				options = 9;
+				for(int k=(row/3)*3;k<(row/3)*3+3;k++) {
+					for(int i=(col/3)*3;i<(col/3)*3+3;i++){
+						if((board[k][i]>0 || !this.checkIfLegal(k, i, v)) || !noteBoard.checkNoteIfLeagal(k, i, v)) {
+							options--;
+						}
+					}
+				}
+				if(options==1) {
+					this.add(row, col, v);
+					return true; 
+				}
 			}
-		}
-		if(temp==1) {
-			this.add(row, col, value);
-			return true;
 		}
 		return false;
 	}
@@ -269,6 +309,7 @@ public class SudokuController implements SudokuSolver {
 			System.out.println(" Failed to add board values! ");
 		}
 		board[row][col] = value;
+		noteBoard = new NoteBoard(board, this);
 	}
 
 	@Override
@@ -297,21 +338,6 @@ public class SudokuController implements SudokuSolver {
 			System.out.println(" Failed to remove board values! ");
 		}
 		board[row][col] = 0;
-	}
-	
-	private boolean isNotSolved() {
-		for(int k=0;k<9;k++) {
-			for(int i=0;i<9;i++) {
-				if(this.checkIfEmpty(k, i)){
-					return true;
-				}else if(!this.checkIfLegal(k, i, board[k][i])){
-					return true;
-				}else if(!this.checkRowNCol(k, i, board[k][i])){
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 	
 	private boolean isFull(){
