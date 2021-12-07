@@ -19,7 +19,9 @@ import org.w3c.dom.Text;
 public class SudokuController {
 	
 	JPanel panelSudoku;
-	
+	/**
+	* Sudukoproblem av olika svårighetsgrader.
+	*/
 	int[][] emptyBoard= {   {0, 0, 0, 0, 0, 0, 0, 0, 0}, 
 							{0, 0, 0, 0, 0, 0, 0, 0, 0},
 							{0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -76,10 +78,21 @@ public class SudokuController {
 										{0, 0, 8, 5, 0, 0, 0, 1, 0},
 										{0, 9, 0, 0, 0, 0, 4, 0, 0}};
 	
+	/**
+	* Skapar ett swing-objekt för att visa Suduko-bärdet grafiskt.
+	*/
 	public SudokuController() { 
 		SwingUtilities.invokeLater(() -> createWindow("Sudoku", 300, 400));
 	}
 	
+	/**
+	* Skapar Javax.swing-objekt för att skapa GUI:et till användaren med knapparna "solve" och "clear".
+	* Beräknar hur lång tid det tog för sudukot att lösas och ger även varningar vid otillåten inskrivning av värden.
+	* Berättar om sudukot går att lösa eller ej.
+	* @param title namnet på fönstret
+	* @param width bredden på fönstret
+	* @param height höjden på fönstret
+	*/
 	public void createWindow(String title, int width, int height) {
 		JFrame frame = new JFrame(title);
 		frame.setBounds(width, height, width, height);
@@ -144,6 +157,12 @@ public class SudokuController {
 		return nbrSquare;
 	}
 	
+	/**
+	* Läser av brädet som finns grafiskt och tar in värden som användaren har skrivit in.
+	* Ändrar färgen på den ruta där otillåtna värden har skrivits in av användaren.
+	* @throws NullPointerException om användaren har skrivit in otillåtna värden
+	* @return board en integer-matris med användarens inskrivna värden
+	*/
 	public int[][] readPanelBoard() {
 		int[][] board = new int[9][9];
 		int temp = 0;
@@ -180,6 +199,10 @@ public class SudokuController {
 		return board;
 	}
 	
+	/**
+	* Skriver ut brädet till GUI:et.
+	* @param board integer-matris med brädet som ska skrivas ut i GUI:et
+	*/
 	public void printPanelBoard(int[][] board){
 		for(int k=0; k<9;k++) {
 			for(int i=0; i<9;i++) {
