@@ -4,9 +4,9 @@ import javax.swing.JTextField;
 
 public class Solver implements SudokuSolver{
 	
-	int[][] board = new int[9][9];
-	int[][] savedBoard = new int[9][9];
-	NoteBoard noteBoard = new NoteBoard(board, this);
+	private int[][] board = new int[9][9];
+	private int[][] savedBoard = new int[9][9];
+	private NoteBoard noteBoard = new NoteBoard(board, this);
 	
 	/**
 	* Använder noteBoard där möjliga värden beräknas och returnerar true om brädet har en lösning, false om lösning saknas.
@@ -86,6 +86,7 @@ public class Solver implements SudokuSolver{
 	*/
 	@Override
 	public int[][] getBoard() {
+		boolean flawLessItr = true;
 		while(!this.isFull()){
 			boolean bruteForce = true;
 			for(int k=0;k<9;k++){
@@ -97,18 +98,29 @@ public class Solver implements SudokuSolver{
 					}
 				}
 			}
-			if(bruteForce && !noteBoard.checkIfBoadIsSolvable(board, this)) {
-				this.clear();
-				this.init(savedBoard);
-			}else if(bruteForce){
-				if(noteBoard.getMostPossiblePlace()>-1){
+			if(bruteForce) {
+				if(!noteBoard.checkIfBoadIsSolvable(board, this)) {
+					this.clear();
+					this.init(savedBoard);
+				}
+			}if(bruteForce){
+					if(flawLessItr && noteBoard.getMostPossiblePlace()>1) {
+						for(int k=0;k<9;k++) {
+							for(int i=0;i<9;i++) {
+								savedBoard[k][i] = board[k][i];
+							}
+						}
+						flawLessItr = false;
+					}
 					do{
-						int newRow = noteBoard.getMostPossiblePlace()/9;
-						int newCol = noteBoard.getMostPossiblePlace()%9;
+						int rowNCol = noteBoard.getMostPossiblePlace();
+						if(rowNCol==-1)break;
+						int newRow = rowNCol/9;
+						int newCol = rowNCol%9;
 						int newValue = noteBoard.getRandomNbrFromIndex(newRow, newCol);
 						this.add(newRow, newCol, newValue);
-					}while(noteBoard.solvedNbrExist()); 
-				}
+					}while(noteBoard.solvedNbrExist());
+				
 			}
 		}
 		return board;
