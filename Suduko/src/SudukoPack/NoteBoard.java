@@ -6,7 +6,7 @@ import java.util.Random;
 import javax.swing.JOptionPane;
 
 public class NoteBoard {
-	ArrayList<ArrayList<Integer>> possibleNbrs;
+	private ArrayList<ArrayList<Integer>> possibleNbrs;
 	
 	/**
 	* Skapar en NoteBoard som används för att hitta alla möjliga lösningar av aktuellt bräde.
