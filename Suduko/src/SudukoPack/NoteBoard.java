@@ -51,6 +51,7 @@ public class NoteBoard {
 			if(temp>possibleNbrs.get(k).size() && 1<possibleNbrs.get(k).size()) {
 				temp = possibleNbrs.get(k).size();
 				index = k;
+				if(temp==1)return index; 
 			}
 		}
 		return index;
