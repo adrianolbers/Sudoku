@@ -8,10 +8,21 @@ public class Solver implements SudokuSolver{
 	int[][] savedBoard = new int[9][9];
 	NoteBoard noteBoard = new NoteBoard(board, this);
 	
+	/**
+	* Använder noteBoard där möjliga värden beräknas och returnerar true om brädet har en lösning, false om lösning saknas.
+	* @return true eller false
+	*/
 	public boolean checkIfSolveble() {
 		return noteBoard.checkIfBoadIsSolvable(board, this);
 	}
 	
+	/**
+	* Verifierar om värdet value är tillåtet att placera på row och col enligt sudukos regler.
+	* @param row raden som värdet ska placeras på
+	* @param col kolumnen som värdet ska placeras på
+	* @param value värdet som ska verifieras
+	* @return true eller false
+	*/
 	@Override
 	public boolean checkIfLegal(int row, int col, int value) {
 		if(!checkRowNCol(row,col,value) || !checkSquare(row,col,value)){
@@ -43,12 +54,22 @@ public class Solver implements SudokuSolver{
 		}
 		return true;
 	}
-
+	
+	/**
+	* Returnerar true om platsen för raden och kolumnen är tom. 
+	* @param row raden för platsen som ska granskas
+	* @param col kolumnen för platsen som granskas
+	* @return true eller false
+	*/
 	@Override
 	public boolean checkIfEmpty(int row, int col) {
 		return board[row][col]==0;
 	}
-
+	
+	/**
+	* Adderar användarens input till savedBoard.
+	* @param integer-matris med användarens input
+	*/
 	@Override
 	public void init(int[][] start) {
 		for(int k=0;k<9;k++) {
@@ -59,6 +80,10 @@ public class Solver implements SudokuSolver{
 		}
 	}
 	
+	/**
+	* Beräknar själva lösningen av brädet genom att anropa metoden solve() och checkIfBoardIsSolvable().
+	* @return integer-matris med lösningen
+	*/
 	@Override
 	public int[][] getBoard() {
 		while(!this.isFull()){
@@ -100,6 +125,12 @@ public class Solver implements SudokuSolver{
 		return true;
 	}
 	
+	/**
+	* Löser varje plats för raden och kolumnen genom att använda värdena och reglerna för suduko.
+	* @param row raden där ett värde ska placeras
+	* @param col kolumnen där ett värde ska placeras
+	* @return true eller false
+	*/
 	@Override
 	public boolean solve(int row, int col) {
 		for(int v=1;v<10;v++){
@@ -142,7 +173,13 @@ public class Solver implements SudokuSolver{
 		}
 		return false;
 	}
-
+	
+	/**
+	* Lägger till rätt värde på rätt plats som beräknas i metoden solve().
+	* @param row raden som värdet ska adderas till
+	* @param col kolumnen som värdet ska adderas till
+	* @param value korrekta värdet som ska adderas på rätt plats.
+	*/
 	@Override
 	public void add(int row, int col, int value) {
 		board[row][col] = value;
@@ -150,6 +187,9 @@ public class Solver implements SudokuSolver{
 	}
 
 	@Override
+	/**
+	* Tömmer hela brädet från alla värden.
+	*/
 	public void clear() {
 		for(int k=0;k<9;k++) {
 			for(int i=0;i<9;i++){
@@ -157,7 +197,12 @@ public class Solver implements SudokuSolver{
 			}
 		}
 	}
-
+	
+	/**
+	* Tar bort värdet från en specifik plats på brädet.
+	* @param row raden som värdet ska tas bort ifrån
+	* @param col kolumnen som värdet ska tas bort ifrån
+	*/
 	@Override
 	public void remove(int row, int col) {
 		board[row][col] = 0;
