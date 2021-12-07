@@ -2,6 +2,7 @@ package SudukoPack;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.*;
 
 import javax.swing.JButton;
@@ -15,12 +16,20 @@ import javax.swing.SwingUtilities;
 
 import org.w3c.dom.Text;
 
-public class SudokuController implements SudokuSolver {
-	int[][] board = new int[9][9];
-	int[][] savedBoard = new int[9][9];
-	NoteBoard noteBoard;
+public class SudokuController {
 	
 	JPanel panelSudoku;
+	
+	int[][] emptyBoard= {   {0, 0, 0, 0, 0, 0, 0, 0, 0}, 
+							{0, 0, 0, 0, 0, 0, 0, 0, 0},
+							{0, 0, 0, 0, 0, 0, 0, 0, 0},
+							{0, 0, 0, 0, 0, 0, 0, 0, 0},
+							{0, 0, 0, 0, 0, 0, 0, 0, 0},
+							{0, 0, 0, 0, 0, 0, 0, 0, 0},
+							{0, 0, 0, 0, 0, 0, 0, 0, 0},
+							{0, 0, 0, 0, 0, 0, 0, 0, 0},
+							{0, 0, 0, 0, 0, 0, 0, 0, 0}};
+
 	int[][] myNumbersMed= { {4, 0, 9, 1, 8, 3, 0, 0, 0}, 
 							{0, 0, 0, 0, 5, 4, 0, 1, 0},
 							{0, 5, 1, 2, 0, 0, 4, 0, 0},
@@ -58,16 +67,16 @@ public class SudokuController implements SudokuSolver {
 								{7, 0, 0, 0, 0, 0, 0, 0, 0},
 								{0, 0, 0, 0, 0, 9, 2, 0, 0}};
 	int[][] myNumbersWorldsHardest= { {8, 0, 0, 0, 0, 0, 0, 0, 0}, 
-							{0, 0, 3, 6, 0, 0, 0, 0, 0},
-							{0, 7, 0, 0, 9, 0, 2, 0, 0},
-							{0, 5, 0, 0, 0, 7, 0, 0, 0},
-							{0, 0, 0, 0, 4, 5, 7, 0, 0},
-							{0, 0, 0, 1, 0, 0, 0, 3, 0},
-							{0, 0, 1, 0, 0, 0, 0, 6, 8},
-							{0, 0, 8, 5, 0, 0, 0, 1, 0},
-							{0, 9, 0, 0, 0, 0, 4, 0, 0}};
+										{0, 0, 3, 6, 0, 0, 0, 0, 0},
+										{0, 7, 0, 0, 9, 0, 2, 0, 0},
+										{0, 5, 0, 0, 0, 7, 0, 0, 0},
+										{0, 0, 0, 0, 4, 5, 7, 0, 0},
+										{0, 0, 0, 1, 0, 0, 0, 3, 0},
+										{0, 0, 1, 0, 0, 0, 0, 6, 8},
+										{0, 0, 8, 5, 0, 0, 0, 1, 0},
+										{0, 9, 0, 0, 0, 0, 4, 0, 0}};
 	
-	public SudokuController() {
+	public SudokuController() { 
 		SwingUtilities.invokeLater(() -> createWindow("Sudoku", 300, 400));
 	}
 	
@@ -78,96 +87,51 @@ public class SudokuController implements SudokuSolver {
 		Container pane = frame.getContentPane();
 		
 		panelSudoku = new JPanel(new GridLayout(9,9));
-		for(int i=0;i<3;i++) {
-			for(int k=0;k<3;k++) {
-				panelSudoku.add(getTextField(Color.orange));
-			}for(int k=0;k<3;k++) {
-				panelSudoku.add(getTextField(Color.white));
-			}for(int k=0;k<3;k++) {
-				panelSudoku.add(getTextField(Color.orange));
-			}
-		}for(int i=0;i<3;i++) {
-			for(int k=0;k<3;k++) {
-				panelSudoku.add(getTextField(Color.white));
-			}for(int k=0;k<3;k++) {
-				panelSudoku.add(getTextField(Color.orange));
-			}for(int k=0;k<3;k++) {
-				panelSudoku.add(getTextField(Color.white));
-			}
-		}for(int i=0;i<3;i++) {
-			for(int k=0;k<3;k++) {
-				panelSudoku.add(getTextField(Color.orange));
-			}for(int k=0;k<3;k++) {
-				panelSudoku.add(getTextField(Color.white));
-			}for(int k=0;k<3;k++) {
-				panelSudoku.add(getTextField(Color.orange));
-			}
+		for(int k=0;k<9;k++) {
+			for(int i=0;i<9;i++) {
+				if(k%6<3 && i%6<3 || (i/3==1 && k/3==1)) {
+					panelSudoku.add(getTextField(Color.orange));
+				}else {
+					panelSudoku.add(getTextField(Color.white));
+				}
+			}	
 		}
 		
-		this.init(myNumbersWorldsHardest);
+		this.printPanelBoard(myNumbersMed);
 		JPanel panelFunction = new JPanel();
 		JButton solveBtn = new JButton("Solve");
 		ActionListener action = event -> {
-			this.init(this.getBoard());
-			int iterations = 0;
-			int restarts = 0;
-			boolean dontStart = false;
-			noteBoard = new NoteBoard(board, this);
-			if(!noteBoard.checkIfBoadIsSolvable(board, this)) {
+			Solver solver = new Solver();
+			try {
+				long timeStart = System. currentTimeMillis();
+				solver.init(this.readPanelBoard());
+				if(solver.checkIfSolveble()){
+					this.printPanelBoard(solver.getBoard());
+					long timeEnd = System. currentTimeMillis();
+					System.out.println("Time it took: "+ (timeEnd-timeStart)/1000 + "s");
+					JOptionPane messageText = new JOptionPane();
+					messageText.showMessageDialog(frame ,"It took " + (timeEnd-timeStart)/1000 + "s and "+(timeEnd-timeStart)%1000+"ms");
+				}else{
+					JOptionPane messageText = new JOptionPane();
+					messageText.showMessageDialog(frame ,"Can't solve Sudoku!");
+				}
+			}catch(Exception e) {
 				JOptionPane messageText = new JOptionPane();
-				messageText.showMessageDialog(frame ,"Can't solve Sudoku!");
-				dontStart = true;
+				messageText.showMessageDialog(frame ,"Iligale input, only numbers from 1-9 are ok!");
 			}
-			long timeStart = System. currentTimeMillis();
-			while(!this.isFull() && !dontStart){
-				boolean bruteForce = true;
-				for(int k=0;k<9;k++){
-					for(int i=0;i<9;i++) {
-						if(this.checkIfEmpty(k, i)){
-							if(this.solve(k, i)) {
-								bruteForce = false;
-							}
-						}
-					}
-				}
-				if(bruteForce && !noteBoard.checkIfBoadIsSolvable(board, this)) {
-					this.clear();
-					this.init(savedBoard);
-					restarts++;
-				}else if(bruteForce){
-					if(noteBoard.getMostPossiblePlace()>-1){
-						do{
-							int newRow = noteBoard.getMostPossiblePlace()/9;
-							int newCol = noteBoard.getMostPossiblePlace()%9;
-							int newValue = noteBoard.getRandomNbrFromIndex(newRow, newCol);
-							this.add(newRow, newCol, newValue);
-						}while(noteBoard.solvedNbrExist()); 
-					}
-				}
-				iterations++;
-			}
-			long timeEnd = System. currentTimeMillis();
-			System.out.println("Time it took: "+ (timeEnd-timeStart)/1000 + "s");
-			System.out.println("Iterations: "+iterations);
-			System.out.println("Restarts: "+restarts);
-			JOptionPane messageText = new JOptionPane();
-			messageText.showMessageDialog(frame ,"It took " + (timeEnd-timeStart)/1000 + "s and "+(timeEnd-timeStart)%1000+"ms\n"+
-			"Iterations: "+iterations+"\n"+
-			"Restarts: "+restarts+"\n");
         };
 		solveBtn.addActionListener(action);
 		
 		JButton clearBtn = new JButton("Clear");
-		clearBtn.addActionListener(event->this.clear());
+		clearBtn.addActionListener(event->	this.printPanelBoard(emptyBoard));
+
+																
 		panelFunction.add(solveBtn);
 		panelFunction.add(clearBtn);
 			
 		pane.add(panelSudoku,BorderLayout.CENTER);
 		pane.add(panelFunction,BorderLayout.SOUTH);
 		
-		
-		
-
 		frame.setVisible(true);
 	}
 	
@@ -180,67 +144,31 @@ public class SudokuController implements SudokuSolver {
 		return nbrSquare;
 	}
 	
-	
-	@Override
-	public boolean checkIfLegal(int row, int col, int value) {
-		if(!checkRowNCol(row,col,value) || !checkSquare(row,col,value)){
-			return false;
-		}
-		return true;
-	}
-	
-	private boolean checkSquare(int row, int col, int value) {
-		for(int k=(row/3)*3;k<(row/3)*3+3;k++) {
-			for(int i=(col/3)*3;i<(col/3)*3+3;i++) {
-				if((k==row && i==col));
-				else if(board[k][i]==value) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-	
-	private boolean checkRowNCol(int row, int col, int value){
-		for(int k=0; k<9;k++) {
-			if(value==board[row][k] && col!=k){
-				return false;
-			}
-			if(value==board[k][col] && row!=k){
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public boolean checkIfEmpty(int row, int col) {
-		return board[row][col]==0;
-	}
-
-	@Override
-	public void init(int[][] start) {
-		for(int k=0;k<9;k++) {
-			for(int i=0;i<9;i++) {
-				board[k][i] = start[k][i];
-				savedBoard[k][i] = start[k][i];
-				this.add(k, i, start[k][i]);
-			}
-		}
-	}
-
-	@Override
-	public int[][] getBoard() {
+	public int[][] readPanelBoard() {
 		int[][] board = new int[9][9];
 		int temp = 0;
 		for(int k=0;k<9;k++) {
 			for(int i=0;i<9;i++) {
 				if(panelSudoku.getComponent(temp) instanceof JTextField) {
 					JTextField text = (JTextField)panelSudoku.getComponent(temp);
+					if(k%6<3 && i%6<3 || (i/3==1 && k/3==1)) {
+						text.setBackground(Color.orange);
+					}else {
+						text.setBackground(Color.white);
+					}
 					if(text.getText().isBlank()){
 						board[k][i] = 0;
 					}else {
-						board[k][i] = Integer.parseInt(text.getText());
+						try {
+							board[k][i] = Integer.parseInt(text.getText());
+						}catch(Exception e) {
+							text.setBackground(Color.red);
+							throw new NullPointerException("Ileagal input");
+						}
+						if(board[k][i]<1 || board[k][i]>9) {
+							text.setBackground(Color.red);
+							throw new NullPointerException("Ileagal input");
+						}
 					}
 					temp++;
 				}else {
@@ -251,104 +179,26 @@ public class SudokuController implements SudokuSolver {
 		
 		return board;
 	}
-
-	@Override
-	public boolean solve(int row, int col) {
-		for(int v=1;v<10;v++){
-			if(this.checkIfLegal(row, col, v) && noteBoard.checkNoteIfLeagal(row, col, v)) {	
-				int options = 9;
-				for(int k=0;k<9;k++) {
-					if((board[k][col]>0 || !this.checkIfLegal(k, col, v)) || !noteBoard.checkNoteIfLeagal(k, col, v)) {
-						options--;
-					}
-				}
-				if(options==1) {
-					this.add(row, col, v);
-					return true; 
-				}
-				
-				options = 9;
-				for(int k=0;k<9;k++) {
-					if((board[row][k]>0 || !this.checkIfLegal(row, k, v)) || !noteBoard.checkNoteIfLeagal(row, k, v)) {
-						options--;
-					}
-				}
-				if(options==1) {
-					this.add(row, col, v);
-					return true; 
-				}
-				
-				options = 9;
-				for(int k=(row/3)*3;k<(row/3)*3+3;k++) {
-					for(int i=(col/3)*3;i<(col/3)*3+3;i++){
-						if((board[k][i]>0 || !this.checkIfLegal(k, i, v)) || !noteBoard.checkNoteIfLeagal(k, i, v)) {
-							options--;
+	
+	public void printPanelBoard(int[][] board){
+		for(int k=0; k<9;k++) {
+			for(int i=0; i<9;i++) {
+				if(panelSudoku.getComponent(k*9+i) instanceof JTextField) {
+					JTextField text = (JTextField)panelSudoku.getComponent(k*9+i);
+						if(board[k][i]>0) {
+							text.setText(Integer.toString(board[k][i]));
+						}else {
+							text.setText("");
 						}
-					}
-				}
-				if(options==1) {
-					this.add(row, col, v);
-					return true; 
-				}
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public void add(int row, int col, int value) {
-		if(panelSudoku.getComponent(row*9+col) instanceof JTextField) {
-			JTextField text = (JTextField)panelSudoku.getComponent(row*9+col);
-				if(value>0) {
-					text.setText(Integer.toString(value));
 				}else {
-					text.setText("");
+					System.out.println(" Failed to add board values! ");
 				}
-				
-		}else {
-			System.out.println(" Failed to add board values! ");
-		}
-		board[row][col] = value;
-		noteBoard = new NoteBoard(board, this);
-	}
-
-	@Override
-	public void clear() {
-		for(int k=0;k<9*9;k++) {
-			if(panelSudoku.getComponent(k) instanceof JTextField) {
-				JTextField text = (JTextField)panelSudoku.getComponent(k);
-				text.setText("");
-			}else {
-				System.out.println(" Failed to clear board values! ");
 			}
 		}
-		for(int k=0;k<9;k++) {
-			for(int i=0;i<9;i++){
-				board[k][i] = 0;
-			}
-		}
-	}
-
-	@Override
-	public void remove(int row, int col) {
-		if(panelSudoku.getComponent(row*9+col) instanceof JTextField) {
-			JTextField text = (JTextField)panelSudoku.getComponent(row*9+col);
-			text.setText("");
-		}else {
-			System.out.println(" Failed to remove board values! ");
-		}
-		board[row][col] = 0;
+		
 	}
 	
-	private boolean isFull(){
-		for(int k=0;k<9;k++) {
-			for(int i=0;i<9;i++) {
-				if(board[k][i]==0){
-					return false;
-				}
-			}
-		}
-		return true;
-	}
+
+	
 	
 }

@@ -8,12 +8,12 @@ import javax.swing.JOptionPane;
 public class NoteBoard {
 	ArrayList<ArrayList<Integer>> possibleNbrs;
 	
-	public NoteBoard(int[][] board, SudokuController solver) {
+	public NoteBoard(int[][] board, Solver solver) {
 		this.addPossibleNbrs(board, solver);
 	}
 	
 	
-	private void addPossibleNbrs(int[][] board, SudokuController solver) {
+	private void addPossibleNbrs(int[][] board, Solver solver) {
 		possibleNbrs = new ArrayList<ArrayList<Integer>>();
 		
 		for(int k=0;k<9*9;k++){
@@ -61,7 +61,7 @@ public class NoteBoard {
 		
 	}
 	
-	public boolean checkIfBoadIsSolvable(int [][] board, SudokuController solver) {
+	public boolean checkIfBoadIsSolvable(int [][] board, Solver solver) {
 		for(int row=0;row<9;row=row+3) {
 			for(int col=0;col<9;col=col+3) {
 				
