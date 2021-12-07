@@ -8,6 +8,11 @@ import javax.swing.JOptionPane;
 public class NoteBoard {
 	ArrayList<ArrayList<Integer>> possibleNbrs;
 	
+	/**
+	* Skapar en NoteBoard som används för att hitta alla möjliga lösningar av aktuellt bräde.
+	* @param integer-matris
+	* @param Solver-objekt
+	*/
 	public NoteBoard(int[][] board, Solver solver) {
 		this.addPossibleNbrs(board, solver);
 	}
@@ -34,7 +39,10 @@ public class NoteBoard {
 		
 		
 	}
-	
+	/**
+	* Tar fram index för mest sannolika lösningsförslaget.
+	* @return index med lägst antal möjliga siffror
+	*/
 	public int getMostPossiblePlace() {
 		int temp = 100;
 		int index = -1;
@@ -48,6 +56,12 @@ public class NoteBoard {
 		return index;
 	}
 	
+	/**
+	* Används för att slumpmässigt ta fram ett möjligt värde om det finns fler än ett.
+	* @param row där det finns flera möjliga lösningar
+	* @param col där det finns flera möjliga lösnningar
+	* @return det slumpmässiga integer-värdet
+	*/
 	public int getRandomNbrFromIndex(int row, int col){
 		Random rand = new Random();
 		int randPlace = rand.nextInt(possibleNbrs.get(row*9+col).size());
@@ -56,11 +70,21 @@ public class NoteBoard {
 		return value;
 	}
 	
+	/**
+	* Ger true om det enbart finns en lösning på en plats, då behöver inte gerRandomNbrFromIndex() användas.
+	* @return true eller false
+	*/
 	public boolean solvedNbrExist(){
 		return possibleNbrs.get(this.getMostPossiblePlace()).size()==1;
 		
 	}
 	
+	/**
+	* Går igenom det aktuella brädet och verifierar om alla möjliga integer-värden är placerade på brädet.
+	* @param integer-matris
+	* @param Solver-objekt
+	* @return true eller false
+	*/
 	public boolean checkIfBoadIsSolvable(int [][] board, Solver solver) {
 		for(int row=0;row<9;row=row+3) {
 			for(int col=0;col<9;col=col+3) {
@@ -93,7 +117,7 @@ public class NoteBoard {
 					if(!solver.checkIfLegal(k, i, board[k][i])) {
 						return false;
 					}
-					
+				
 				}
 			}
 		}
@@ -102,6 +126,13 @@ public class NoteBoard {
 		return true;
 	}
 	
+	/**
+	* Verifierar att alla värden i matrisen är legala inom Sudukoreglerna genom att jämföra alla värden på varje column, row och ruta.
+	* @param row
+	* @param col
+	* @param value
+	* @return true eller false
+	*/
 	public boolean checkNoteIfLeagal(int row, int col, int value) {
 		for(int indexSqr=0; indexSqr<9; indexSqr=indexSqr+3){
 			if((row/3)*3!=indexSqr && (col/3)*3!=indexSqr) {
