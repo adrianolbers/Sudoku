@@ -86,55 +86,8 @@ public class Solver implements SudokuSolver{
 	*/
 	@Override
 	public int[][] getBoard() {
-		boolean flawLessItr = true;
-		while(!this.isFull()){
-			boolean bruteForce = true;
-			for(int k=0;k<9;k++){
-				for(int i=0;i<9;i++) {
-					if(this.checkIfEmpty(k, i)){
-						if(this.solve(k, i)) {
-							bruteForce = false;
-						}
-					}
-				}
-			}
-			if(bruteForce) {
-				if(!noteBoard.checkIfBoadIsSolvable(board, this)) {
-					this.clear();
-					this.init(savedBoard);
-				}
-			}if(bruteForce){
-					if(flawLessItr && noteBoard.getMostPossiblePlace()>1) {
-						for(int k=0;k<9;k++) {
-							for(int i=0;i<9;i++) {
-								savedBoard[k][i] = board[k][i];
-							}
-						}
-						flawLessItr = false;
-					}
-					do{
-						int rowNCol = noteBoard.getMostPossiblePlace();
-						if(rowNCol==-1)break;
-						int newRow = rowNCol/9;
-						int newCol = rowNCol%9;
-						int newValue = noteBoard.getRandomNbrFromIndex(newRow, newCol);
-						this.add(newRow, newCol, newValue);
-					}while(noteBoard.solvedNbrExist());
-				
-			}
-		}
+		while(!this.solve(0, 0));
 		return board;
-	}
-	
-	private boolean isFull(){
-		for(int k=0;k<9;k++) {
-			for(int i=0;i<9;i++) {
-				if(board[k][i]==0){
-					return false;
-				}
-			}
-		}
-		return true;
 	}
 	
 	/**
@@ -145,45 +98,73 @@ public class Solver implements SudokuSolver{
 	*/
 	@Override
 	public boolean solve(int row, int col) {
-		for(int v=1;v<10;v++){
-			if(this.checkIfLegal(row, col, v) && noteBoard.checkNoteIfLeagal(row, col, v)) {	
-				int options = 9;
-				for(int k=0;k<9;k++) {
-					if((board[k][col]>0 || !this.checkIfLegal(k, col, v)) || !noteBoard.checkNoteIfLeagal(k, col, v)) {
-						options--;
-					}
-				}
-				if(options==1) {
-					this.add(row, col, v);
-					return true; 
-				}
-				
-				options = 9;
-				for(int k=0;k<9;k++) {
-					if((board[row][k]>0 || !this.checkIfLegal(row, k, v)) || !noteBoard.checkNoteIfLeagal(row, k, v)) {
-						options--;
-					}
-				}
-				if(options==1) {
-					this.add(row, col, v);
-					return true; 
-				}
-				
-				options = 9;
-				for(int k=(row/3)*3;k<(row/3)*3+3;k++) {
-					for(int i=(col/3)*3;i<(col/3)*3+3;i++){
-						if((board[k][i]>0 || !this.checkIfLegal(k, i, v)) || !noteBoard.checkNoteIfLeagal(k, i, v)) {
+		int nextSquare = noteBoard.getMostPossiblePlace();
+		if(nextSquare == -1)return true;
+		if(!this.checkIfSolveble()) {
+			return false;
+		}
+		if(board[row][col]==0){
+			for(int v=1;v<10;v++){
+				if(this.checkIfLegal(row, col, v) && noteBoard.checkNoteIfLeagal(row, col, v)) {	
+					int options = 9;
+					for(int k=0;k<9;k++) {
+						if((board[k][col]>0 || !this.checkIfLegal(k, col, v)) || !noteBoard.checkNoteIfLeagal(k, col, v)) {
 							options--;
 						}
 					}
+					if(options==1) {
+						this.add(row, col, v);
+						break;
+					}
+					
+					options = 9;
+					for(int k=0;k<9;k++) {
+						if((board[row][k]>0 || !this.checkIfLegal(row, k, v)) || !noteBoard.checkNoteIfLeagal(row, k, v)) {
+							options--;
+						}
+					}
+					if(options==1) {
+						this.add(row, col, v);
+						break; 
+					}
+					
+					options = 9;
+					for(int k=(row/3)*3;k<(row/3)*3+3;k++) {
+						for(int i=(col/3)*3;i<(col/3)*3+3;i++){
+							if((board[k][i]>0 || !this.checkIfLegal(k, i, v)) || !noteBoard.checkNoteIfLeagal(k, i, v)) {
+								options--;
+							}
+						}
+					}
+					if(options==1) {
+						this.add(row, col, v);
+						break;
+					}
 				}
-				if(options==1) {
-					this.add(row, col, v);
-					return true; 
+			}
+			
+			if(board[row][col]==0){
+				int p1 = 0;
+				do{
+				this.remove(row, col);
+				if(noteBoard.amountOfPossibleNumbers(row,col) > p1) {
+					int newValue = noteBoard.getValueFromIndex(row, col, p1);
+					this.add(row, col, newValue);
+				}else{
+					return false;
+				}
+				p1++;
+				}while(!solve(nextSquare/9, nextSquare%9));
+			}else {
+				if(solve(nextSquare/9, nextSquare%9)){
+					return true;
+				}else {
+					this.remove(row, col);
+					return false;
 				}
 			}
 		}
-		return false;
+		return solve(nextSquare/9, nextSquare%9);
 	}
 	
 	/**
@@ -205,7 +186,7 @@ public class Solver implements SudokuSolver{
 	public void clear() {
 		for(int k=0;k<9;k++) {
 			for(int i=0;i<9;i++){
-				board[k][i] = 0;
+				this.remove(k, i);
 			}
 		}
 	}
@@ -218,5 +199,6 @@ public class Solver implements SudokuSolver{
 	@Override
 	public void remove(int row, int col) {
 		board[row][col] = 0;
+		noteBoard = new NoteBoard(board, this);
 	}
 }
