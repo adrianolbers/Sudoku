@@ -57,27 +57,12 @@ public class NoteBoard {
 		return index;
 	}
 	
-	/**
-	* Används för att slumpmässigt ta fram ett möjligt värde om det finns fler än ett.
-	* @param row där det finns flera möjliga lösningar
-	* @param col där det finns flera möjliga lösnningar
-	* @return det slumpmässiga integer-värdet
-	*/
-	public int getRandomNbrFromIndex(int row, int col){
-		Random rand = new Random();
-		int randPlace = rand.nextInt(possibleNbrs.get(row*9+col).size());
-		int value = possibleNbrs.get(row*9+col).get(randPlace);
-		possibleNbrs.get(row*9+col).remove(randPlace);
-		return value;
+	public int amountOfPossibleNumbers(int row, int col){
+		return possibleNbrs.get(row*9+col).size();
 	}
 	
-	/**
-	* Ger true om det enbart finns en lösning på en plats, då behöver inte gerRandomNbrFromIndex() användas.
-	* @return true eller false
-	*/
-	public boolean solvedNbrExist(){
-		return possibleNbrs.get(this.getMostPossiblePlace()).size()==1;
-		
+	public int getValueFromIndex(int row, int col, int index) {
+		return possibleNbrs.get((row*9)+col).get(index);
 	}
 	
 	/**
