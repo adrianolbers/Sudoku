@@ -102,14 +102,10 @@ public class Solver implements SudokuSolver{
 		itter++;
 		System.out.println("Iterations: " + itter);
 		if(!this.checkIfSolveble()) {
-			isSolved = false;
 			return false;
 		}
 		int nextSquare = noteBoard.getMostPossiblePlace();
-		if(nextSquare == -1) {
-			isSolved = true;
-			return true;
-		}
+		if(nextSquare == -1)return true;
 		if(board[row][col]==0){
 			for(int v=1;v<10;v++){
 				if(this.checkIfLegal(row, col, v) && noteBoard.checkNoteIfLeagal(row, col, v)) {	
@@ -158,20 +154,16 @@ public class Solver implements SudokuSolver{
 					int newValue = noteBoard.getValueFromIndex(row, col, p1);
 					this.add(row, col, newValue);
 				}else {
-					isSolved = false;
 					return false;
 				}
 				p1++;
 				}while(!solve(nextSquare/9, nextSquare%9));
-				isSolved = true;
 				return true;
 			}else {
 				if(solve(nextSquare/9, nextSquare%9)){
-					isSolved = true;
 					return true;
 				}else {
 					this.remove(row, col);
-					isSolved = false;
 					return false;
 				}
 			}
