@@ -19,6 +19,7 @@ import org.w3c.dom.Text;
 public class SudokuController {
 	
 	JPanel panelSudoku;
+	private DefaultSodukos actBoard;
 	/**
 	* Sudukoproblem av olika svårighetsgrader.
 	*/
