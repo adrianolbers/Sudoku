@@ -94,6 +94,15 @@ public class SudokuController {
 	* @param height höjden på fönstret
 	*/
 	public void createWindow(String title, int width, int height) {
+		DefaultSodukos[] defaultSudokus = new DefaultSodukos[6];
+		defaultSudokus[0] = new DefaultSodukos(emptyBoard, "Empty");
+		defaultSudokus[1] = new DefaultSodukos(myNumbersMed, "Medium");
+		defaultSudokus[2] = new DefaultSodukos(myNumbersHard, "Hard");
+		defaultSudokus[3] = new DefaultSodukos(myNumbersVeryHard, "VeryHard");
+		defaultSudokus[4] = new DefaultSodukos(myNumbersEvilHard, "EvilHard");
+		defaultSudokus[5] = new DefaultSodukos(myNumbersWorldsHardest, "WorldsHardest");
+		actBoard = defaultSudokus[0];
+		
 		JFrame frame = new JFrame(title);
 		frame.setBounds(width, height, width, height);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -110,30 +119,40 @@ public class SudokuController {
 			}	
 		}
 		
-		this.printPanelBoard(myNumbersMed);
+		this.printPanelBoard(actBoard.getBoard());
 		JPanel panelFunction = new JPanel();
+		
 		JButton solveBtn = new JButton("Solve");
 		ActionListener action = event -> {
 			Solver solver = new Solver();
 			try {
-				long timeStart = System. currentTimeMillis();
 				solver.init(this.readPanelBoard());
-				if(solver.checkIfSolveble()){
-					this.printPanelBoard(solver.getBoard());
-					long timeEnd = System. currentTimeMillis();
-					System.out.println("Time it took: "+ (timeEnd-timeStart)/1000 + "s");
+				long timeStart = System. currentTimeMillis();
+				solver.solve(0, 0);
+				long timeEnd = System. currentTimeMillis();
+				int[][] tempBoard = solver.getBoard();
+				if(solver.checkIfSolveble() && solver.isSolved()){
+					this.printPanelBoard(tempBoard);
 					JOptionPane messageText = new JOptionPane();
-					messageText.showMessageDialog(frame ,"It took " + (timeEnd-timeStart)/1000 + "s and "+(timeEnd-timeStart)%1000+"ms");
+					messageText.showMessageDialog(frame ,"It took " + ((timeEnd-timeStart)/1000) + "s and "+((timeEnd-timeStart)%1000) +"ms");
 				}else{
 					JOptionPane messageText = new JOptionPane();
 					messageText.showMessageDialog(frame ,"Can't solve Sudoku!");
 				}
 			}catch(Exception e) {
+				System.out.println(e);
 				JOptionPane messageText = new JOptionPane();
 				messageText.showMessageDialog(frame ,"Iligale input, only numbers from 1-9 are ok!");
 			}
         };
 		solveBtn.addActionListener(action);
+		
+		JComboBox<DefaultSodukos> comboBox = new JComboBox<>(defaultSudokus);
+        comboBox.addActionListener(e -> {
+        	actBoard = (DefaultSodukos)comboBox.getSelectedItem();
+            this.printPanelBoard(actBoard.getBoard());
+        });
+	     
 		
 		JButton clearBtn = new JButton("Clear");
 		clearBtn.addActionListener(event->	this.printPanelBoard(emptyBoard));
@@ -141,6 +160,7 @@ public class SudokuController {
 																
 		panelFunction.add(solveBtn);
 		panelFunction.add(clearBtn);
+		panelFunction.add(comboBox);
 			
 		pane.add(panelSudoku,BorderLayout.CENTER);
 		pane.add(panelFunction,BorderLayout.SOUTH);
