@@ -131,10 +131,10 @@ public class SudokuController {
 			try {
 				solver.init(this.readPanelBoard());
 				long timeStart = System. currentTimeMillis();
-				solver.solve(0, 0);
+				boolean solved = solver.solve(0, 0);
 				long timeEnd = System. currentTimeMillis();
 				int[][] tempBoard = solver.getBoard();
-				if(solver.checkIfSolveble() && solver.isSolved()){
+				if(solver.checkIfSolveble() && solved){
 					this.printPanelBoard(tempBoard);
 					JOptionPane messageText = new JOptionPane();
 					messageText.showMessageDialog(frame ,"It took " + ((timeEnd-timeStart)/1000) + "s and "+((timeEnd-timeStart)%1000) +"ms");
