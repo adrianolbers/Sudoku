@@ -88,7 +88,13 @@ public class Solver implements SudokuSolver{
 	*/
 	@Override
 	public int[][] getBoard() {
-		return board;
+		int[][] temp = new int[9][9];
+		for(int k = 0; k<9;k++){
+			for(int i = 0; i<9;i++){
+				temp[k][i] = board[k][i]
+			}
+		}
+		return temp;
 	}
 	
 	/**
