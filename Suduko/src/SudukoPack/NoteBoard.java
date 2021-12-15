@@ -36,8 +36,6 @@ public class NoteBoard {
 				}
 			}
 		}
-		
-		
 	}
 	/**
 	* Tar fram index för mest sannolika lösningsförslaget.
@@ -48,7 +46,7 @@ public class NoteBoard {
 		int index = -1;
 		
 		for(int k=0;k<possibleNbrs.size();k++){
-			if(temp>possibleNbrs.get(k).size() && 1<possibleNbrs.get(k).size()) {
+			if(temp>possibleNbrs.get(k).size() && 1<=possibleNbrs.get(k).size()) {
 				temp = possibleNbrs.get(k).size();
 				index = k;
 				if(temp==1)return index; 
@@ -103,7 +101,7 @@ public class NoteBoard {
 					if(!solver.checkIfLegal(k, i, board[k][i])) {
 						return false;
 					}
-				
+					
 				}
 			}
 		}
