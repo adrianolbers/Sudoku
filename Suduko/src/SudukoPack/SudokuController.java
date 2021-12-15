@@ -20,12 +20,12 @@ import org.w3c.dom.Text;
 
 public class SudokuController {
 	
-	JPanel panelSudoku;
+	private JPanel panelSudoku;
 	private DefaultSodukos actBoard;
 	/**
 	* Sudukoproblem av olika svårighetsgrader.
 	*/
-	int[][] emptyBoard= {   {0, 0, 0, 0, 0, 0, 0, 0, 0}, 
+	private int[][] emptyBoard= {   {0, 0, 0, 0, 0, 0, 0, 0, 0}, 
 							{0, 0, 0, 0, 0, 0, 0, 0, 0},
 							{0, 0, 0, 0, 0, 0, 0, 0, 0},
 							{0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -35,7 +35,7 @@ public class SudokuController {
 							{0, 0, 0, 0, 0, 0, 0, 0, 0},
 							{0, 0, 0, 0, 0, 0, 0, 0, 0}};
 
-	int[][] myNumbersMed= { {4, 0, 9, 1, 8, 3, 0, 0, 0}, 
+	private int[][] myNumbersMed= { {4, 0, 9, 1, 8, 3, 0, 0, 0}, 
 							{0, 0, 0, 0, 5, 4, 0, 1, 0},
 							{0, 5, 1, 2, 0, 0, 4, 0, 0},
 							{9, 0, 6, 7, 1, 0, 0, 0, 0},
@@ -44,7 +44,7 @@ public class SudokuController {
 							{0, 0, 0, 5, 0, 1, 0, 0, 0},
 							{7, 3, 0, 0, 0, 0, 0, 0, 0},
 							{0, 0, 5, 0, 0, 6, 0, 0, 4}};
-	int[][] myNumbersHard = {{7, 5, 0, 0, 8, 0, 0, 0, 0}, 
+	private int[][] myNumbersHard = {{7, 5, 0, 0, 8, 0, 0, 0, 0}, 
 							{0, 0, 8, 3, 0, 0, 7, 0, 0},
 							{0, 0, 0, 0, 0, 0, 0, 0, 0},
 							{1, 8, 5, 0, 0, 0, 0, 2, 0},
@@ -53,7 +53,7 @@ public class SudokuController {
 							{0, 0, 0, 6, 0, 0, 9, 0, 0},
 							{0, 0, 7, 5, 0, 9, 0, 1, 3},
 							{0, 4, 0, 0, 0, 0, 0, 0, 0}};
-	int[][] myNumbersVeryHard = { 	{4, 1, 0, 0, 8, 0, 0, 2, 0}, 
+	private int[][] myNumbersVeryHard = { 	{4, 1, 0, 0, 8, 0, 0, 2, 0}, 
 							{2, 0, 0, 0, 6, 0, 0, 0, 9},
 							{0, 0, 0, 1, 0, 5, 0, 0, 0},
 							{0, 0, 9, 5, 0, 0, 3, 0, 0},
@@ -62,7 +62,7 @@ public class SudokuController {
 							{0, 0, 0, 8, 0, 6, 0, 0, 0},
 							{9, 0, 0, 0, 4, 0, 0, 0, 8},
 							{0, 6, 0, 0, 1, 0, 0, 7, 4}};
-	int[][] myNumbersEvilHard = {	{0, 9, 0, 0, 0, 0, 0, 1, 0}, 
+	private int[][] myNumbersEvilHard = {	{0, 9, 0, 0, 0, 0, 0, 1, 0}, 
 								{5, 0, 1, 0, 0, 3, 0, 0, 6},
 								{0, 7, 0, 0, 5, 0, 0, 0, 0},
 								{2, 0, 4, 0, 9, 0, 0, 6, 0},
@@ -71,7 +71,7 @@ public class SudokuController {
 								{6, 0, 5, 0, 2, 0, 0, 4, 0},
 								{7, 0, 0, 0, 0, 0, 0, 0, 0},
 								{0, 0, 0, 0, 0, 9, 2, 0, 0}};
-	int[][] myNumbersWorldsHardest= { {8, 0, 0, 0, 0, 0, 0, 0, 0}, 
+	private int[][] myNumbersWorldsHardest= { {8, 0, 0, 0, 0, 0, 0, 0, 0}, 
 										{0, 0, 3, 6, 0, 0, 0, 0, 0},
 										{0, 7, 0, 0, 9, 0, 2, 0, 0},
 										{0, 5, 0, 0, 0, 7, 0, 0, 0},
