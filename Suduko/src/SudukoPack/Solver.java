@@ -7,6 +7,8 @@ public class Solver implements SudokuSolver{
 	private int[][] board = new int[9][9];
 	private int[][] savedBoard = new int[9][9];
 	private NoteBoard noteBoard = new NoteBoard(board, this);
+	private boolean isSolved = false;
+	private int itter = 0;
 	
 	/**
 	* Använder noteBoard där möjliga värden beräknas och returnerar true om brädet har en lösning, false om lösning saknas.
