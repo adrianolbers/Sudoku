@@ -206,8 +206,4 @@ public class Solver implements SudokuSolver{
 		board[row][col] = 0;
 		noteBoard = new NoteBoard(board, this);
 	}
-	
-	public boolean isSolved() {
-		return isSolved;
-	}
 }
