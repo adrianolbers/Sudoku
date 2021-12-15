@@ -86,7 +86,6 @@ public class Solver implements SudokuSolver{
 	*/
 	@Override
 	public int[][] getBoard() {
-		while(!this.solve(0, 0));
 		return board;
 	}
 	
@@ -98,10 +97,16 @@ public class Solver implements SudokuSolver{
 	*/
 	@Override
 	public boolean solve(int row, int col) {
-		int nextSquare = noteBoard.getMostPossiblePlace();
-		if(nextSquare == -1)return true;
+		itter++;
+		System.out.println("Iterations: " + itter);
 		if(!this.checkIfSolveble()) {
+			isSolved = false;
 			return false;
+		}
+		int nextSquare = noteBoard.getMostPossiblePlace();
+		if(nextSquare == -1) {
+			isSolved = true;
+			return true;
 		}
 		if(board[row][col]==0){
 			for(int v=1;v<10;v++){
@@ -150,16 +155,21 @@ public class Solver implements SudokuSolver{
 				if(noteBoard.amountOfPossibleNumbers(row,col) > p1) {
 					int newValue = noteBoard.getValueFromIndex(row, col, p1);
 					this.add(row, col, newValue);
-				}else{
+				}else {
+					isSolved = false;
 					return false;
 				}
 				p1++;
 				}while(!solve(nextSquare/9, nextSquare%9));
+				isSolved = true;
+				return true;
 			}else {
 				if(solve(nextSquare/9, nextSquare%9)){
+					isSolved = true;
 					return true;
 				}else {
 					this.remove(row, col);
+					isSolved = false;
 					return false;
 				}
 			}
@@ -184,6 +194,7 @@ public class Solver implements SudokuSolver{
 	* Tömmer hela brädet från alla värden.
 	*/
 	public void clear() {
+		isSolved = false;
 		for(int k=0;k<9;k++) {
 			for(int i=0;i<9;i++){
 				this.remove(k, i);
@@ -200,5 +211,9 @@ public class Solver implements SudokuSolver{
 	public void remove(int row, int col) {
 		board[row][col] = 0;
 		noteBoard = new NoteBoard(board, this);
+	}
+	
+	public boolean isSolved() {
+		return isSolved;
 	}
 }
