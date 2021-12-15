@@ -114,44 +114,8 @@ public class Solver implements SudokuSolver{
 		if(nextSquare == -1)return true;
 		if(board[row][col]==0){
 			for(int v=1;v<10;v++){
-				if(this.checkIfLegal(row, col, v) && noteBoard.checkNoteIfLeagal(row, col, v)) {	
-					int options = 9;
-					for(int k=0;k<9;k++) {
-						if((board[k][col]>0 || !this.checkIfLegal(k, col, v)) || !noteBoard.checkNoteIfLeagal(k, col, v)) {
-							options--;
-						}
-					}
-					if(options==1) {
-						this.add(row, col, v);
-						break;
-					}
-					
-					options = 9;
-					for(int k=0;k<9;k++) {
-						if((board[row][k]>0 || !this.checkIfLegal(row, k, v)) || !noteBoard.checkNoteIfLeagal(row, k, v)) {
-							options--;
-						}
-					}
-					if(options==1) {
-						this.add(row, col, v);
-						break; 
-					}
-					
-					options = 9;
-					for(int k=(row/3)*3;k<(row/3)*3+3;k++) {
-						for(int i=(col/3)*3;i<(col/3)*3+3;i++){
-							if((board[k][i]>0 || !this.checkIfLegal(k, i, v)) || !noteBoard.checkNoteIfLeagal(k, i, v)) {
-								options--;
-							}
-						}
-					}
-					if(options==1) {
-						this.add(row, col, v);
-						break;
-					}
-				}
+				if(checkIfOnlyOneOption(row, col, v))break;
 			}
-			
 			if(board[row][col]==0){
 				int p1 = 0;
 				do{
@@ -175,6 +139,46 @@ public class Solver implements SudokuSolver{
 			}
 		}
 		return solve(nextSquare/9, nextSquare%9);
+	}
+	
+	private boolean checkIfOnlyOneOption(int row, int col, int v) {
+		if(this.checkIfLegal(row, col, v) && noteBoard.checkNoteIfLeagal(row, col, v)) {	
+			int options = 9;
+			for(int k=0;k<9;k++) {
+				if((board[k][col]>0 || !this.checkIfLegal(k, col, v)) || !noteBoard.checkNoteIfLeagal(k, col, v)) {
+					options--;
+				}
+			}
+			if(options==1) {
+				this.add(row, col, v);
+				return true;
+			}
+			
+			options = 9;
+			for(int k=0;k<9;k++) {
+				if((board[row][k]>0 || !this.checkIfLegal(row, k, v)) || !noteBoard.checkNoteIfLeagal(row, k, v)) {
+					options--;
+				}
+			}
+			if(options==1) {
+				this.add(row, col, v);
+				return true;
+			}
+			
+			options = 9;
+			for(int k=(row/3)*3;k<(row/3)*3+3;k++) {
+				for(int i=(col/3)*3;i<(col/3)*3+3;i++){
+					if((board[k][i]>0 || !this.checkIfLegal(k, i, v)) || !noteBoard.checkNoteIfLeagal(k, i, v)) {
+						options--;
+					}
+				}
+			}
+			if(options==1) {
+				this.add(row, col, v);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
